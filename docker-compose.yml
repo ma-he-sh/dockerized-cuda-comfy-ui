@@ -1,0 +1,30 @@
+version: '3.5'
+
+services:
+  compy-ui:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: comfyui
+    restart: always
+    ports:
+      - 7860:7860
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    environment:
+      REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY: /data
+    volumes:
+      - ./models:/src/models/checkpoints:rw,cached
+      - ./output:/src/output:rw,cached
+      - ./input:/src/input:rw,cached
+    networks:
+      - comfy
+
+networks:
+  comfy:
+    driver: bridge
